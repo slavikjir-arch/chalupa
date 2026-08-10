@@ -141,7 +141,7 @@ async function initializeDatabase() {
           difficulty: 'easy',
           duration: '3 hodiny',
           highlights: ['Koupání', 'Přírodní pláž', 'Bezpečnost pro děti', 'Rybaření'],
-          image: '/gallery/F5.jpg',
+          image: '/trips/rybnik-drahota.jpg',
         },
         {
           name: 'Přírodní koupací biotop Blovice',
@@ -150,7 +150,7 @@ async function initializeDatabase() {
           difficulty: 'easy',
           duration: '3 hodiny',
           highlights: ['Koupání v přírodě', 'Čistá voda', 'Ekologický přístup', 'Sluneční pláž'],
-          image: '/gallery/F3.jpg',
+          image: '/trips/blovice.jpg',
         },
         {
           name: 'Zámeček Zelenohorská pošta + Nepomuk',
@@ -159,7 +159,7 @@ async function initializeDatabase() {
           difficulty: 'medium',
           duration: '4 hodiny',
           highlights: ['Historická stavba', 'Architektura', 'Městská setkání', 'Kulturní dědictví'],
-          image: '/gallery/F4.jpg',
+          image: '/trips/zamecek.jpg',
         },
         {
           name: 'Tenisový kurt - Spálené Poříčí',
@@ -168,7 +168,7 @@ async function initializeDatabase() {
           difficulty: 'easy',
           duration: '1.5 hodin',
           highlights: ['Tenis', 'Sport', 'Rekreace', 'Sociální aktivita'],
-          image: '/gallery/F6.jpg',
+          image: '/trips/tenis.jpg',
         },
         {
           name: 'Rozhledna Šťastná věž',
@@ -177,7 +177,7 @@ async function initializeDatabase() {
           difficulty: 'medium',
           duration: '2 hodiny',
           highlights: ['Panoramatický výhled', 'Fotografie krajiny', 'Historická stavba', 'Vzdálené pohledy'],
-          image: '/gallery/F2.jpg',
+          image: '/trips/rozhledna-stastna.jpg',
         },
         {
           name: 'Padrťské rybníky',
@@ -186,7 +186,7 @@ async function initializeDatabase() {
           difficulty: 'easy',
           duration: '2 hodiny',
           highlights: ['Rybníky', 'Rybaření', 'Pozorování ptáků', 'Přírodní krajina'],
-          image: '/gallery/F7.jpg',
+          image: '/trips/padrske-rybniky.jpg',
         },
         {
           name: 'Farma Zlatá kráva',
@@ -195,7 +195,7 @@ async function initializeDatabase() {
           difficulty: 'easy',
           duration: '2 hodiny',
           highlights: ['Zvířata', 'Zemědělství', 'Edukace pro děti', 'Farmářské produkty'],
-          image: '/gallery/F5.jpg',
+          image: '/trips/farma.jpg',
         },
         {
           name: 'Přírodní rezervace Fajmanovy skály',
@@ -204,7 +204,7 @@ async function initializeDatabase() {
           difficulty: 'medium',
           duration: '2.5 hodin',
           highlights: ['Skální útvary', 'Chráněné druhy', 'Geologické zajímavosti', 'Přírodní krása'],
-          image: '/gallery/F3.jpg',
+          image: '/trips/fajmanovy-skaly.jpg',
         },
         {
           name: 'Zřícenina hradu Třemšín',
@@ -213,7 +213,7 @@ async function initializeDatabase() {
           difficulty: 'medium',
           duration: '3 hodiny',
           highlights: ['Středověké ruiny', 'Historická architektura', 'Panoramatický výhled', 'Fotografické Body'],
-          image: '/gallery/F4.jpg',
+          image: '/trips/hrad-tremstin.jpg',
         },
         {
           name: 'Historická architektura Železného Újezda',
@@ -222,7 +222,7 @@ async function initializeDatabase() {
           difficulty: 'easy',
           duration: '1.5 hodin',
           highlights: ['Tradiční česká stavby', 'Svatý Florián', 'Kulturní pamětihodnosti', 'Místní tradice'],
-          image: '/gallery/F7.jpg',
+          image: '/trips/architektura.jpg',
         },
         {
           name: 'Cyklovýlet na Čížkov',
@@ -231,7 +231,7 @@ async function initializeDatabase() {
           difficulty: 'medium',
           duration: '2.5 hodin',
           highlights: ['Cyklostezky', 'Pitoreskní vesnice', 'Místní hospůdka', 'Pastorální krajina'],
-          image: '/gallery/F2.jpg',
+          image: '/trips/cyklovylet-cizkov.jpg',
         },
         {
           name: 'Okruh kolem rybníka Dožín',
@@ -240,7 +240,7 @@ async function initializeDatabase() {
           difficulty: 'easy',
           duration: '1.5 hodin',
           highlights: ['Vodní ptáci', 'Výhled na hladinu', 'Přírodní fotografie', 'Pikniková místa'],
-          image: '/gallery/F6.jpg',
+          image: '/trips/rybnik-dozin.jpg',
         },
         {
           name: 'Přírodní park Brdy',
@@ -249,7 +249,7 @@ async function initializeDatabase() {
           difficulty: 'medium',
           duration: '4 hodiny',
           highlights: ['Chráněný přírodní park', 'Lesní ekosystém', 'Vzácné rostliny a zvířata', 'Údolí potoků'],
-          image: '/gallery/F4.jpg',
+          image: '/trips/prirodni-park-brdy.jpg',
         },
         {
           name: 'Naučná stezka Železný Újezd',
@@ -258,7 +258,7 @@ async function initializeDatabase() {
           difficulty: 'easy',
           duration: '1.5 hodin',
           highlights: ['Informační tabule', 'Přírodní zajímavosti', 'Místní historie', 'Architektura'],
-          image: '/gallery/F3.jpg',
+          image: '/trips/naucna-stezka.jpg',
         },
         {
           name: 'Rozhledna Na Skále',
@@ -267,7 +267,7 @@ async function initializeDatabase() {
           difficulty: 'easy',
           duration: '2 hodiny',
           highlights: ['Panoramatický výhled', 'Rybník Dožín', 'Historická stavba', 'Lesní stezky'],
-          image: '/gallery/F5.jpg',
+          image: '/trips/rozhledna-na-skale.jpg',
         },
       ];
 
