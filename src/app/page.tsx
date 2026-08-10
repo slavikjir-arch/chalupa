@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Home() {
   return (
@@ -6,14 +7,23 @@ export default function Home() {
 
 
       {/* Hero Section */}
-      <section className="max-w-6xl mx-auto px-4 py-20 text-center">
+      <section className="max-w-6xl mx-auto px-4 py-12 text-center">
         <h2 className="text-5xl font-bold text-gray-900 mb-4">
           Malebná chalupa v Železném Újezdě
         </h2>
         <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-          Pronájmeme si krásnou chalupu v klidné vesnici Železný Újezd s výhledem na přírodní park Brdy. 
+          Pronájmeme si krásnou chalupu v klidné vesnici Železný Újezd s výhledem na přírodní park Brdy.
           Ideální pro rodinné dovolené, skupinové pobyty i klidný relax v přírodě.
         </p>
+        <div className="relative w-full h-96 rounded-2xl overflow-hidden shadow-xl mb-8">
+          <Image
+            src="/gallery/ch1.jpg"
+            alt="Chalupa Brdy"
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
         <Link
           href="/reservations"
           className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
