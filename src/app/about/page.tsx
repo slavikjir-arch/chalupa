@@ -1,6 +1,6 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { getCottageInfo } from '@/lib/db';
-import Gallery from '@/components/Gallery';
 import Map from '@/components/Map';
 
 export default async function AboutPage() {
@@ -22,9 +22,16 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      {/* Photo gallery */}
+      {/* Photo */}
       <section className="max-w-6xl mx-auto px-4 py-12">
-        <Gallery images={cottage.images} />
+        <div className="relative w-full h-96 rounded-2xl overflow-hidden shadow-xl">
+          <Image
+            src={cottage.images[0]}
+            alt={cottage.name}
+            fill
+            className="object-cover"
+          />
+        </div>
       </section>
 
       {/* Main Content */}
@@ -59,8 +66,8 @@ export default async function AboutPage() {
                 <span className="text-lg">{cottage.capacity} osob</span>
               </div>
               <div className="flex justify-between items-center border-b pb-3">
-                <span className="font-semibold">Cena za noc:</span>
-                <span className="text-lg">{cottage.pricePerNight} Kč</span>
+                <span className="font-semibold">Týden So - So:</span>
+                <span className="text-lg">12 000 Kč</span>
               </div>
               <div className="border-b pb-3">
                 <span className="font-semibold">Vybavení:</span>
@@ -93,7 +100,7 @@ export default async function AboutPage() {
         <div className="mb-20">
           <h2 className="text-3xl font-bold mb-8 text-center">Poloha chalupy</h2>
           <p className="text-center text-gray-600 mb-6 max-w-2xl mx-auto">
-            Chalupa Jasmína se nachází v malebné vesnici Železný Újezd v kraji Plzeň-jih, 
+            Chalupa Brdy se nachází v malebné vesnici Železný Újezd v kraji Plzeň-jih, 
             ideálně umístěná pro turistiku a poznávání přírodních atraktivit Brd.
           </p>
           <Map />

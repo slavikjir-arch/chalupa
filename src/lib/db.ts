@@ -78,7 +78,7 @@ async function initializeDatabase() {
         ) VALUES ($1, $2, $3, $4, $5, $6, $7)
       `, [
         'default',
-        'Chalupa Jasmína',
+        'Chalupa Brdy',
         'Krásná venkovská chalupa v Železném Újezdě obklopená květinami a zelení. Ideální pro rodiny a skupiny přátel. Chalupa nabízí 8 míst na spaní (3x dvoulůžko, 1x jednolůžko, 1x rozkládací gauč). Vytápění je zajištěno plynovým kotlem a radiátory. Kuchyň je vybavena sporákem, troubou, mikrovlnkou a lednicí. V chalupě jsou 2 ložnice, kuchyň a prostorný obývák spojený s jídelnou. Vedle chalupy je příjemná hospůdka, kde vaří.',
         8,
         2500,
@@ -106,13 +106,13 @@ async function initializeDatabase() {
         ])
       ]);
     } else {
-      // Oprava starých názvů fotek pokud existují
+      // Vždy aktualizujeme data na správné hodnoty
       await client.query(`
         UPDATE cottage_info
-        SET images = $1
+        SET name = $1, images = $2
         WHERE id = 'default'
-          AND images::text LIKE '%20160821%'
       `, [
+        'Chalupa Brdy',
         JSON.stringify([
           '/gallery/ch1.jpg',
           '/gallery/F2.jpg',
