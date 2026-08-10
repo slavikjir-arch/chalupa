@@ -24,7 +24,8 @@ export default function Calendar({
   };
 
   const getFirstDayOfMonth = (date: Date) => {
-    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+    const day = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+    return day === 0 ? 6 : day - 1;
   };
 
   const isDateBooked = (day: number): boolean => {
@@ -47,18 +48,24 @@ export default function Calendar({
 
   const handleDateClick = (day: number) => {
     const dateStr = getDateString(day);
-    
+
     if (isDateBooked(day)) return;
 
     if (!checkInDate) {
+      // Vybírám check-in
       onCheckInChange(dateStr);
     } else if (!checkOutDate) {
+      // Mám check-in, vybírám check-out
       if (dateStr > checkInDate) {
         onCheckOutChange(dateStr);
       } else {
+        // Pokud je nové datum dříve, resetuji a vybírám nový check-in
+        onCheckOutChange('');
         onCheckInChange(dateStr);
       }
     } else {
+      // Mám oba data - reset a začínam znova
+      onCheckOutChange('');
       onCheckInChange(dateStr);
     }
   };
@@ -68,7 +75,7 @@ export default function Calendar({
     'Červenec', 'Srpen', 'Září', 'Říjen', 'Listopad', 'Prosinec',
   ];
 
-  const dayNames = ['Ne', 'Po', 'Út', 'St', 'Čt', 'Pá', 'So'];
+  const dayNames = ['Po', 'Út', 'St', 'Čt', 'Pá', 'So', 'Ne'];
 
   const daysInMonth = getDaysInMonth(currentDate);
   const firstDayOfMonth = getFirstDayOfMonth(currentDate);

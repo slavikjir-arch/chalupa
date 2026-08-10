@@ -1,7 +1,6 @@
 'use client';
 
-import Link from 'next/link';
-import { FormEvent, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Reservation } from '@/lib/types';
 import { calculateReservationPrice } from '@/lib/pricing';
 import Calendar from '@/components/Calendar';
@@ -56,7 +55,7 @@ export default function ReservationsPage() {
     fetchReservations();
   }, []);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setMessage(null);
@@ -106,12 +105,6 @@ export default function ReservationsPage() {
     }));
   };
 
-  const getMinCheckOutDate = () => {
-    if (!formData.checkInDate) return '';
-    const date = new Date(formData.checkInDate);
-    date.setDate(date.getDate() + 1);
-    return date.toISOString().split('T')[0];
-  };
 
   const getPricing = () => {
     if (!formData.checkInDate || !formData.checkOutDate) {
@@ -132,21 +125,6 @@ export default function ReservationsPage() {
 
   const formatPrice = (num: number) => {
     return num.toLocaleString('cs-CZ', { maximumFractionDigits: 0 });
-  };
-  const isDateBooked = (dateString: string): boolean => {
-    return bookedDates.has(dateString);
-  };
-
-  const checkDateRangeConflict = (): boolean => {
-    if (!formData.checkInDate || !formData.checkOutDate) return false;
-    const start = new Date(formData.checkInDate);
-    const end = new Date(formData.checkOutDate);
-    for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
-      if (bookedDates.has(d.toISOString().split('T')[0])) {
-        return true;
-      }
-    }
-    return false;
   };
 
   return (
@@ -332,12 +310,6 @@ export default function ReservationsPage() {
               * Povinná pole
             </p>
 
-            {/* Cancellation Policy */}
-            <div className="mt-8 bg-blue-50 p-4 rounded-lg border border-blue-200">
-              <p className="text-sm text-blue-900">
-                <span className="font-semibold">📋 Zrušení nebo změna:</span> Budete moct zrušit nebo změnit rezervaci do 7 dnů před příjezdem.
-              </p>
-            </div>
           </div>
         </form>
 
