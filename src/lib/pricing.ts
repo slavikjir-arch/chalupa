@@ -1,7 +1,7 @@
 // Pricing logic for cottage reservations
 // Seasons:
-// - Summer (1.7 - 31.8): 13,500 CZK per week (SO-SO)
-// - Off-season (1.9 - 30.6): 11,500 CZK per week / 7,500 CZK per weekend
+// - Summer (1.7 - 31.8): 13,500 CZK per week (SATURDAY to SATURDAY ONLY)
+// - Off-season (1.9 - 30.6): 11,500 CZK per week / 7,500 CZK minimum (weekend)
 // - New Year's Eve (31.12 - 1.1): 18,000 CZK
 // - Easter: 15,000 CZK per 4 nights
 
@@ -11,25 +11,24 @@ export interface PricingResult {
   nights: number;
   season: string;
   breakdown: string;
+  error?: string;
 }
 
 function isInSummer(date: Date): boolean {
-  const month = date.getMonth() + 1; // 0-11 to 1-12
-  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  return month === 7 || month === 8;
+}
 
-  // July 1 - August 31
-  if ((month === 7) || (month === 8)) return true;
-  return false;
+function isSaturday(date: Date): boolean {
+  return date.getDay() === 6;
 }
 
 function isNewYearsEve(checkIn: Date, checkOut: Date): boolean {
-  // Check if the period includes Dec 31 or Jan 1
   const checkInMonth = checkIn.getMonth() + 1;
   const checkInDay = checkIn.getDate();
   const checkOutMonth = checkOut.getMonth() + 1;
   const checkOutDay = checkOut.getDate();
 
-  // If check-in is in December after 28th or check-out is in January before 3rd
   if ((checkInMonth === 12 && checkInDay >= 28) ||
       (checkOutMonth === 1 && checkOutDay <= 3)) {
     return true;
@@ -38,13 +37,8 @@ function isNewYearsEve(checkIn: Date, checkOut: Date): boolean {
 }
 
 function isEaster(checkIn: Date, checkOut: Date): boolean {
-  // Easter dates (approximate for common years)
-  // This is simplified - in production you'd calculate Easter dynamically
   const year = checkIn.getFullYear();
 
-  // Easter 2025: April 20
-  // Easter 2026: April 5
-  // Easter 2027: March 28
   const easterDates: { [key: number]: { month: number; day: number } } = {
     2025: { month: 4, day: 20 },
     2026: { month: 4, day: 5 },
@@ -57,49 +51,35 @@ function isEaster(checkIn: Date, checkOut: Date): boolean {
 
   const easterDate = new Date(year, easter.month - 1, easter.day);
   const easterStart = new Date(easterDate);
-  easterStart.setDate(easterStart.getDate() - 1); // Sunday before
+  easterStart.setDate(easterStart.getDate() - 1);
   const easterEnd = new Date(easterDate);
-  easterEnd.setDate(easterEnd.getDate() + 2); // Tuesday after
+  easterEnd.setDate(easterEnd.getDate() + 2);
 
-  // Check if reservation overlaps with Easter period
   return checkIn <= easterEnd && checkOut >= easterStart;
-}
-
-function isWeekend(date: Date): boolean {
-  const day = date.getDay();
-  return day === 5 || day === 6; // Friday or Saturday
-}
-
-function countWeekendDays(checkIn: Date, checkOut: Date): number {
-  let weekendDays = 0;
-  let current = new Date(checkIn);
-
-  while (current < checkOut) {
-    if (isWeekend(current)) {
-      weekendDays++;
-    }
-    current.setDate(current.getDate() + 1);
-  }
-
-  return weekendDays;
-}
-
-function countWeekdays(checkIn: Date, checkOut: Date): number {
-  const totalDays = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
-  const weekendDays = countWeekendDays(checkIn, checkOut);
-  return totalDays - weekendDays;
 }
 
 export function calculateReservationPrice(checkInStr: string, checkOutStr: string): PricingResult {
   const checkIn = new Date(checkInStr);
   const checkOut = new Date(checkOutStr);
 
+  // Validation: checkout must be after check-in
+  if (checkOut <= checkIn) {
+    return {
+      pricePerNight: 0,
+      totalPrice: 0,
+      nights: 0,
+      season: 'Chyba',
+      breakdown: '',
+      error: 'Datum odjezdu musí být po datu příjezdu',
+    };
+  }
+
   const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
 
   // Check for special periods first
   if (isNewYearsEve(checkIn, checkOut)) {
     return {
-      pricePerNight: 18000 / nights, // 18,000 CZK for the period
+      pricePerNight: 18000 / nights,
       totalPrice: 18000,
       nights,
       season: 'Silvestr',
@@ -108,7 +88,6 @@ export function calculateReservationPrice(checkInStr: string, checkOutStr: strin
   }
 
   if (isEaster(checkIn, checkOut)) {
-    // Easter pricing: 15,000 for 4 nights
     const totalPrice = Math.round((nights / 4) * 15000);
     return {
       pricePerNight: totalPrice / nights,
@@ -121,7 +100,29 @@ export function calculateReservationPrice(checkInStr: string, checkOutStr: strin
 
   // Regular season pricing
   if (isInSummer(checkIn)) {
-    // Summer: 13,500 CZK per week (SO-SO)
+    // Summer: ONLY Saturday to Saturday (7-day weeks)
+    if (!isSaturday(checkIn)) {
+      return {
+        pricePerNight: 0,
+        totalPrice: 0,
+        nights,
+        season: 'Letní sezóna',
+        breakdown: '',
+        error: 'V letní sezóně je vyžadován pobyt od soboty do soboty',
+      };
+    }
+
+    if (nights % 7 !== 0) {
+      return {
+        pricePerNight: 0,
+        totalPrice: 0,
+        nights,
+        season: 'Letní sezóna',
+        breakdown: '',
+        error: 'V letní sezóně je vyžadován pobyt v celých týdnech (7, 14, 21 nocí)',
+      };
+    }
+
     const weeks = nights / 7;
     const totalPrice = Math.round(weeks * 13500);
     return {
@@ -133,9 +134,8 @@ export function calculateReservationPrice(checkInStr: string, checkOutStr: strin
     };
   }
 
-  // Off-season
+  // Off-season: flexible days with minimum 7,500 CZK for any night
   if (nights >= 7) {
-    // Off-season weekly: 11,500 CZK per week
     const weeks = nights / 7;
     const totalPrice = Math.round(weeks * 11500);
     return {
@@ -147,25 +147,12 @@ export function calculateReservationPrice(checkInStr: string, checkOutStr: strin
     };
   }
 
-  // Off-season weekend (Fri-Sun, typically 2-3 nights)
-  if (nights <= 3 && checkIn.getDay() === 4) { // Friday
-    return {
-      pricePerNight: 7500 / nights,
-      totalPrice: 7500,
-      nights,
-      season: 'Mimo sezónu (víkend)',
-      breakdown: '7 500 Kč za víkend',
-    };
-  }
-
-  // Default: off-season weekly rate
-  const weeks = nights / 7;
-  const totalPrice = Math.round(weeks * 11500);
+  // Off-season: less than 7 nights = minimum weekend price
   return {
-    pricePerNight: totalPrice / nights,
-    totalPrice,
+    pricePerNight: 7500 / nights,
+    totalPrice: 7500,
     nights,
-    season: 'Mimo sezónu',
-    breakdown: `11 500 Kč za týden (${weeks.toFixed(1)} týdne)`,
+    season: 'Mimo sezónu (víkend)',
+    breakdown: '7 500 Kč za víkend (minimální cena)',
   };
 }

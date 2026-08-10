@@ -266,21 +266,29 @@ export default function ReservationsPage() {
                 </div>
                 {formData.checkInDate && formData.checkOutDate && getPricing() && (
                   <div className="mt-4 space-y-2 border-t border-blue-200 pt-2">
-                    <p className="text-sm text-gray-600">
-                      Počet nocí: <span className="font-semibold text-gray-900">{computeNights()}</span>
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Sezóna: <span className="font-semibold text-gray-900">{getPricing()?.season}</span>
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {getPricing()?.breakdown}
-                    </p>
-                    <p className="text-lg font-bold text-blue-600 mt-2">
-                      Cena celkem: {formatPrice(computeTotal())} Kč
-                    </p>
-                    <p className="text-xs text-gray-500 italic">
-                      *K ceně se přičítá cena za spotřebované energie
-                    </p>
+                    {getPricing()?.error ? (
+                      <div className="bg-red-100 text-red-800 p-3 rounded-lg text-sm">
+                        ⚠️ {getPricing()?.error}
+                      </div>
+                    ) : (
+                      <>
+                        <p className="text-sm text-gray-600">
+                          Počet nocí: <span className="font-semibold text-gray-900">{computeNights()}</span>
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Sezóna: <span className="font-semibold text-gray-900">{getPricing()?.season}</span>
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {getPricing()?.breakdown}
+                        </p>
+                        <p className="text-lg font-bold text-blue-600 mt-2">
+                          Cena celkem: {formatPrice(computeTotal())} Kč
+                        </p>
+                        <p className="text-xs text-gray-500 italic">
+                          *K ceně se přičítá cena za spotřebované energie
+                        </p>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
@@ -308,15 +316,28 @@ export default function ReservationsPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading || !formData.checkInDate || !formData.checkOutDate}
+              disabled={loading || !formData.checkInDate || !formData.checkOutDate || !!getPricing()?.error}
               className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              {loading ? 'Odesílání...' : !formData.checkInDate || !formData.checkOutDate ? 'Vyberte datum v kalendáři' : 'Zarezervovat'}
+              {loading
+                ? 'Odesílání...'
+                : !formData.checkInDate || !formData.checkOutDate
+                  ? 'Vyberte datum v kalendáři'
+                  : getPricing()?.error
+                    ? 'Opravte chybu výběru data'
+                    : 'Zarezervovat'}
             </button>
 
             <p className="text-sm text-gray-600 text-center">
               * Povinná pole
             </p>
+
+            {/* Cancellation Policy */}
+            <div className="mt-8 bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <p className="text-sm text-blue-900">
+                <span className="font-semibold">📋 Zrušení nebo změna:</span> Budete moct zrušit nebo změnit rezervaci do 7 dnů před příjezdem.
+              </p>
+            </div>
           </div>
         </form>
 
