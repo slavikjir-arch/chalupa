@@ -16,7 +16,7 @@ export default function AdminPage() {
   // Jednoduché ověřování (v produkci by mělo být bezpečnější)
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'admin123') {
+    if (password === 'n7ndmySHOJ4ej9f7') {
       setAuthenticated(true);
       setLoginError('');
       setPassword('');
@@ -118,10 +118,6 @@ export default function AdminPage() {
               Přihlásit se
             </button>
           </form>
-
-          <p className="text-sm text-gray-600 text-center mt-6">
-            Testovací heslo: admin123
-          </p>
 
           <Link href="/" className="block text-center mt-4 text-blue-600 hover:text-blue-700">
             Zpět na domovskou stránku
