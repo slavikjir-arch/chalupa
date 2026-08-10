@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { Reservation } from '@/lib/types';
 
 export default function AdminPage() {
@@ -13,16 +13,28 @@ export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false);
   const [loginError, setLoginError] = useState('');
 
-  // Jednoduché ověřování (v produkci by mělo být bezpečnější)
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (password === 'n7ndmySHOJ4ej9f7') {
-      setAuthenticated(true);
-      setLoginError('');
-      setPassword('');
-      loadReservations();
-    } else {
-      setLoginError('Nesprávné heslo');
+    setLoginError('');
+
+    try {
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+
+      if (response.ok) {
+        setAuthenticated(true);
+        setPassword('');
+        loadReservations();
+      } else {
+        const data = await response.json();
+        setLoginError(data.error || 'Přihlášení selhalo');
+      }
+    } catch (error) {
+      setLoginError('Chyba při přihlášení');
+      console.error('Login error:', error);
     }
   };
 
