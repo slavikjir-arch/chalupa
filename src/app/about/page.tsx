@@ -153,6 +153,10 @@ export default async function AboutPage() {
             <p className="text-sm text-yellow-900">
               <span className="font-semibold">⚡ Poznámka:</span> K ceně ubytování se přičítá cena za spotřebované energie.
             </p>
+            <ul className="text-sm text-yellow-900 mt-3 space-y-1">
+              <li>• <span className="font-semibold">Poplatek za psa:</span> 550 Kč</li>
+              <li>• <span className="font-semibold">Vratná kauce:</span> 4 000 Kč</li>
+            </ul>
           </div>
         </div>
 
