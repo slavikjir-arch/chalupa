@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { FormEvent, useState, useEffect } from 'react';
 import { Reservation } from '@/lib/types';
+import { calculateReservationPrice } from '@/lib/pricing';
 import Calendar from '@/components/Calendar';
 
 interface FormData {
@@ -26,18 +27,15 @@ export default function ReservationsPage() {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [reservations, setReservations] = useState<Reservation[]>([]);
   const [bookedDates, setBookedDates] = useState<Set<string>>(new Set());
-  const [pricePerNight, setPricePerNight] = useState<number>(0);
 
-  // Načtení rezervací a ceny při mountu
+  // Načtení rezervací při mountu
   useEffect(() => {
     const fetchReservations = async () => {
       try {
         const response = await fetch('/api/reservations');
         const data = await response.json();
-        setReservations(data);
-        
+
         // Vytvoření sady obsazených dat
         const booked = new Set<string>();
         data.forEach((res: Reservation) => {
@@ -55,18 +53,7 @@ export default function ReservationsPage() {
       }
     };
 
-    const fetchPrice = async () => {
-      try {
-        const res = await fetch('/api/cottage');
-        const data = await res.json();
-        setPricePerNight(data.pricePerNight || 0);
-      } catch (e) {
-        console.error('Chyba při načítání ceny:', e);
-      }
-    };
-
     fetchReservations();
-    fetchPrice();
   }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -75,10 +62,15 @@ export default function ReservationsPage() {
     setMessage(null);
 
     try {
+      const pricing = calculateReservationPrice(formData.checkInDate, formData.checkOutDate);
+
       const response = await fetch('/api/reservations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          totalPrice: pricing.totalPrice,
+        }),
       });
 
       const data = await response.json();
@@ -98,10 +90,6 @@ export default function ReservationsPage() {
           checkOutDate: '',
           numberOfGuests: '1',
         });
-        // Obnova rezervací
-        const resResponse = await fetch('/api/reservations');
-        const resData = await resResponse.json();
-        setReservations(resData);
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'Chyba při odeslání formuláře' });
@@ -125,16 +113,21 @@ export default function ReservationsPage() {
     return date.toISOString().split('T')[0];
   };
 
+  const getPricing = () => {
+    if (!formData.checkInDate || !formData.checkOutDate) {
+      return null;
+    }
+    return calculateReservationPrice(formData.checkInDate, formData.checkOutDate);
+  };
+
   const computeNights = () => {
-    if (!formData.checkInDate || !formData.checkOutDate) return 0;
-    const start = new Date(formData.checkInDate);
-    const end = new Date(formData.checkOutDate);
-    const diff = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
-    return diff > 0 ? diff : 0;
+    const pricing = getPricing();
+    return pricing?.nights || 0;
   };
 
   const computeTotal = () => {
-    return computeNights() * pricePerNight;
+    const pricing = getPricing();
+    return pricing?.totalPrice || 0;
   };
 
   const formatPrice = (num: number) => {
@@ -271,13 +264,22 @@ export default function ReservationsPage() {
                     </p>
                   </div>
                 </div>
-                {formData.checkInDate && formData.checkOutDate && (
-                  <div className="mt-2 text-right">
+                {formData.checkInDate && formData.checkOutDate && getPricing() && (
+                  <div className="mt-4 space-y-2 border-t border-blue-200 pt-2">
                     <p className="text-sm text-gray-600">
-                      Počet nocí: {computeNights()}
+                      Počet nocí: <span className="font-semibold text-gray-900">{computeNights()}</span>
                     </p>
-                    <p className="font-semibold text-gray-900">
+                    <p className="text-sm text-gray-600">
+                      Sezóna: <span className="font-semibold text-gray-900">{getPricing()?.season}</span>
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {getPricing()?.breakdown}
+                    </p>
+                    <p className="text-lg font-bold text-blue-600 mt-2">
                       Cena celkem: {formatPrice(computeTotal())} Kč
+                    </p>
+                    <p className="text-xs text-gray-500 italic">
+                      *K ceně se přičítá cena za spotřebované energie
                     </p>
                   </div>
                 )}
