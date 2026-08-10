@@ -134,20 +134,35 @@ export function calculateReservationPrice(checkInStr: string, checkOutStr: strin
     };
   }
 
-  // Off-season: flexible days with minimum 7,500 CZK for any night
-  if (nights >= 7) {
-    const weeks = nights / 7;
-    const totalPrice = Math.round(weeks * 11500);
+  // Off-season: flexible days
+  // More than 2 nights: price by weeks + weekend for remaining nights
+  if (nights > 2) {
+    const fullWeeks = Math.floor(nights / 7);
+    const remainingNights = nights % 7;
+
+    let totalPrice = fullWeeks * 11500;
+    let breakdown = '';
+
+    if (remainingNights === 0) {
+      breakdown = `11 500 Kč za týden (${fullWeeks} týden${fullWeeks > 1 ? 'y' : ''})`;
+    } else if (remainingNights <= 2) {
+      totalPrice += 7500;
+      breakdown = `${fullWeeks} týden${fullWeeks > 1 ? 'y' : ''} (11 500 Kč) + víkend (7 500 Kč)`;
+    } else {
+      totalPrice += 11500;
+      breakdown = `${fullWeeks + 1} týden${fullWeeks + 1 > 1 ? 'y' : ''} (${(fullWeeks + 1) * 11500} Kč)`;
+    }
+
     return {
       pricePerNight: totalPrice / nights,
       totalPrice,
       nights,
       season: 'Mimo sezónu (týden)',
-      breakdown: `11 500 Kč za týden (${weeks.toFixed(1)} týdne)`,
+      breakdown,
     };
   }
 
-  // Off-season: less than 7 nights = minimum weekend price
+  // Off-season: 2 nights or less = minimum weekend price
   return {
     pricePerNight: 7500 / nights,
     totalPrice: 7500,
