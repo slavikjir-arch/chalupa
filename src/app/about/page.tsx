@@ -67,10 +67,6 @@ export default async function AboutPage() {
                 <span className="font-semibold">Kapacita:</span>
                 <span className="text-lg">{cottage.capacity} osob</span>
               </div>
-              <div className="flex justify-between items-center border-b pb-3">
-                <span className="font-semibold">Týden So - So:</span>
-                <span className="text-lg">12 000 Kč</span>
-              </div>
               <div className="border-b pb-3">
                 <span className="font-semibold">Vybavení:</span>
                 <ul className="list-disc list-inside mt-2 space-y-1">
