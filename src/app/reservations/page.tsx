@@ -146,8 +146,8 @@ export default function ReservationsPage() {
           <h3 className="text-lg font-semibold mb-4 text-gray-900">📅 Vyberte datum pobytu</h3>
           <Calendar
             bookedDates={bookedDates}
-            onCheckInChange={(date) => setFormData({ ...formData, checkInDate: date })}
-            onCheckOutChange={(date) => setFormData({ ...formData, checkOutDate: date })}
+            onCheckInChange={(date) => setFormData(prev => ({ ...prev, checkInDate: date }))}
+            onCheckOutChange={(date) => setFormData(prev => ({ ...prev, checkOutDate: date }))}
             checkInDate={formData.checkInDate}
             checkOutDate={formData.checkOutDate}
           />
