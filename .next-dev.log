@@ -1,0 +1,26 @@
+
+> chalupa@0.1.0 dev
+> next dev
+
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.88.8:3000
+- Environments: .env.local
+
+✓ Starting...
+Creating turbopack project { dir: 'D:\\projekty\\chalupa', testMode: true }
+✓ Ready in 1548ms
+ GET / 200 in 1951ms (compile: 1533ms, render: 419ms)
+ GET /about 200 in 351ms (compile: 62ms, render: 289ms)
+ GET /gallery 200 in 159ms (compile: 72ms, render: 87ms)
+ GET /api/gallery 200 in 175ms (compile: 145ms, render: 29ms)
+ GET / 200 in 198ms (compile: 20ms, render: 178ms)
+ GET /about 200 in 129ms (compile: 12ms, render: 117ms)
+ GET /gallery 200 in 99ms (compile: 17ms, render: 82ms)
+ GET /api/gallery 200 in 50ms (compile: 7ms, render: 42ms)
+ GET /about 200 in 115ms (compile: 6ms, render: 110ms)
+ GET /reservations 200 in 206ms (compile: 88ms, render: 117ms)
+ GET /api/cottage 200 in 162ms (compile: 143ms, render: 18ms)
+ GET /api/reservations 200 in 317ms (compile: 303ms, render: 14ms)
+ GET /gallery 200 in 93ms (compile: 14ms, render: 79ms)
+ GET /api/gallery 200 in 18ms (compile: 7ms, render: 11ms)

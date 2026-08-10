@@ -1,0 +1,1 @@
+Place your actual photos of Chalupa Jasmína in this folder and name them `chalupa1.jpg` and `chalupa2.jpg`. These images will be displayed on the "O chalup1b" page.
