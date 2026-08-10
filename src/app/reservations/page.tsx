@@ -320,7 +320,6 @@ export default function ReservationsPage() {
             <li>✓ Dostanete potvrzovací email s detaily vaší rezervace</li>
             <li>✓ Administrátor si prověří dostupnost a kontaktuje vás</li>
             <li>✓ Obdržíte instrukce pro check-in a instrukce pro vstup</li>
-            <li>✓ Budete moct zrušit nebo změnit rezervaci do 7 dnů před příjezdem</li>
           </ul>
         </div>
       </section>
