@@ -167,56 +167,6 @@ export default function ReservationsPage() {
           )}
 
           <div className="space-y-6">
-            {/* Guest Information */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">Vaše údaje</h3>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Jméno *
-                </label>
-                <input
-                  type="text"
-                  name="guestName"
-                  value={formData.guestName}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Vaše jméno a příjmení"
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  name="guestEmail"
-                  value={formData.guestEmail}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="vase.email@priklad.cz"
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Telefon *
-                </label>
-                <input
-                  type="tel"
-                  name="guestPhone"
-                  value={formData.guestPhone}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="+420 123 456 789"
-                />
-              </div>
-            </div>
-
             {/* Reservation Details */}
             <div>
               <h3 className="text-lg font-semibold mb-4 text-gray-900">Detaily rezervace</h3>
@@ -288,6 +238,56 @@ export default function ReservationsPage() {
                     </option>
                   ))}
                 </select>
+              </div>
+            </div>
+
+            {/* Guest Information */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4 text-gray-900">Vaše údaje</h3>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Jméno *
+                </label>
+                <input
+                  type="text"
+                  name="guestName"
+                  value={formData.guestName}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Vaše jméno a příjmení"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  name="guestEmail"
+                  value={formData.guestEmail}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="vase.email@priklad.cz"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Telefon *
+                </label>
+                <input
+                  type="tel"
+                  name="guestPhone"
+                  value={formData.guestPhone}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="+420 123 456 789"
+                />
               </div>
             </div>
 
