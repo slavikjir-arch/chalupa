@@ -93,10 +93,37 @@ async function initializeDatabase() {
           'Příjemná hospůdka vedle chalupy',
         ]),
         JSON.stringify([
-          '/gallery/20160821_162544.jpg',
-          '/gallery/20160821_162605.jpg',
-          '/gallery/20160821_162631.jpg',
-          '/gallery/20160821_162705.jpg',
+          '/gallery/ch1.jpg',
+          '/gallery/F2.jpg',
+          '/gallery/F3.jpg',
+          '/gallery/F4.jpg',
+          '/gallery/F5.jpg',
+          '/gallery/F6.jpg',
+          '/gallery/F7.jpg',
+          '/gallery/F8.jpg',
+          '/gallery/F9.jpg',
+          '/gallery/F10.jpg',
+        ])
+      ]);
+    } else {
+      // Oprava starých názvů fotek pokud existují
+      await client.query(`
+        UPDATE cottage_info
+        SET images = $1
+        WHERE id = 'default'
+          AND images::text LIKE '%20160821%'
+      `, [
+        JSON.stringify([
+          '/gallery/ch1.jpg',
+          '/gallery/F2.jpg',
+          '/gallery/F3.jpg',
+          '/gallery/F4.jpg',
+          '/gallery/F5.jpg',
+          '/gallery/F6.jpg',
+          '/gallery/F7.jpg',
+          '/gallery/F8.jpg',
+          '/gallery/F9.jpg',
+          '/gallery/F10.jpg',
         ])
       ]);
     }
