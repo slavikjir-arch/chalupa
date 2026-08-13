@@ -30,6 +30,9 @@ export interface Reservation {
   numberOfGuests: number;
   totalPrice: number;
   status: 'pending' | 'confirmed' | 'cancelled';
+  notes?: string;
+  hasPet?: boolean;
+  petBreed?: string;
   createdAt: string;
 }
 

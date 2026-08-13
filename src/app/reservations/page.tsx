@@ -12,6 +12,9 @@ interface FormData {
   checkInDate: string;
   checkOutDate: string;
   numberOfGuests: string;
+  notes: string;
+  hasPet: boolean;
+  petBreed: string;
 }
 
 export default function ReservationsPage() {
@@ -22,6 +25,9 @@ export default function ReservationsPage() {
     checkInDate: '',
     checkOutDate: '',
     numberOfGuests: '1',
+    notes: '',
+    hasPet: false,
+    petBreed: '',
   });
 
   const [loading, setLoading] = useState(false);
@@ -88,6 +94,9 @@ export default function ReservationsPage() {
           checkInDate: '',
           checkOutDate: '',
           numberOfGuests: '1',
+          notes: '',
+          hasPet: false,
+          petBreed: '',
         });
       }
     } catch (error) {
@@ -97,8 +106,17 @@ export default function ReservationsPage() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const target = e.target;
+    const { name } = target;
+    let value: string | boolean;
+
+    if ('checked' in target) {
+      value = target.checked;
+    } else {
+      value = target.value;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -287,6 +305,61 @@ export default function ReservationsPage() {
                   required
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="+420 123 456 789"
+                />
+              </div>
+            </div>
+
+            {/* Pet */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4 text-gray-900">Domácí zvíře</h3>
+
+              <div className="mb-4">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="hasPet"
+                    checked={formData.hasPet}
+                    onChange={handleChange}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="ml-3 text-sm font-medium text-gray-700">
+                    Přivezu si domácí zvíře (poplatek 550 Kč)
+                  </span>
+                </label>
+              </div>
+
+              {formData.hasPet && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Rasa zvířete
+                  </label>
+                  <input
+                    type="text"
+                    name="petBreed"
+                    value={formData.petBreed}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Např. Německý ovčák"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Notes */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4 text-gray-900">Poznámka</h3>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Poznámka k rezervaci
+                </label>
+                <textarea
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Vaše poznámka (volitelné)"
+                  rows={4}
                 />
               </div>
             </div>

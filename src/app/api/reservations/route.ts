@@ -3,12 +3,9 @@ import nodemailer from 'nodemailer';
 import {
   addReservation,
   getReservations,
-  getReservation,
-  updateReservation,
   getAvailability,
-  getCottageInfo,
 } from '@/lib/db';
-import { Reservation } from '@/lib/types';
+import { calculateReservationPrice } from '@/lib/pricing';
 
 // Vytvoření emailového transportu
 const transporter = nodemailer.createTransport({
@@ -20,7 +17,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // E-mail funkce
-async function sendReservationConfirmation(guestName: string, guestEmail: string, checkInDate: string, checkOutDate: string, numberOfGuests: number, totalPrice: number, reservationId: string) {
+async function sendReservationConfirmation(guestName: string, guestEmail: string, checkInDate: string, checkOutDate: string, numberOfGuests: number, totalPrice: number, reservationId: string, notes?: string, hasPet?: boolean, petBreed?: string) {
   try {
     const checkInFormatted = new Date(checkInDate).toLocaleDateString('cs-CZ');
     const checkOutFormatted = new Date(checkOutDate).toLocaleDateString('cs-CZ');
@@ -29,10 +26,13 @@ async function sendReservationConfirmation(guestName: string, guestEmail: string
         (1000 * 60 * 60 * 24)
     );
 
+    const notesSection = notes ? `<p><strong>Vaše poznámka:</strong><br/>${notes}</p>` : '';
+    const petSection = hasPet ? `<p><strong>Domácí zvíře:</strong> ${petBreed || 'Ano'} (poplatek 550 Kč)</p>` : '';
+
     const htmlContent = `
       <html>
         <body style="font-family: Arial, sans-serif; color: #333;">
-          <h2>Potvrzení rezervace - Chalupa Jasmína</h2>
+          <h2>Potvrzení rezervace - Chalupa Brdy</h2>
           <p>Dobrý den ${guestName},</p>
           <p>Děkujeme za vaši rezervaci! Zde jsou detaily vaší rezervace:</p>
           <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
@@ -42,9 +42,11 @@ async function sendReservationConfirmation(guestName: string, guestEmail: string
             <p><strong>Počet nocí:</strong> ${nights}</p>
             <p><strong>Počet hostů:</strong> ${numberOfGuests}</p>
             <p><strong>Celková cena:</strong> ${totalPrice.toLocaleString('cs-CZ')} Kč</p>
+            ${petSection}
+            ${notesSection}
           </div>
           <p>Těšíme se na vaši návštěvu!</p>
-          <p>S pozdravem,<br/>Chalupa Jasmína</p>
+          <p>S pozdravem,<br/>Chalupa Brdy</p>
         </body>
       </html>
     `;
@@ -53,7 +55,7 @@ async function sendReservationConfirmation(guestName: string, guestEmail: string
       await transporter.sendMail({
         from: process.env.EMAIL_FROM || 'info@chalupa.cz',
         to: guestEmail,
-        subject: `Potvrzení rezervace - Chalupa Jasmína (${reservationId})`,
+        subject: `Potvrzení rezervace - Chalupa Brdy (${reservationId})`,
         html: htmlContent,
       });
       console.log(`Potvrzovací email poslán na ${guestEmail}`);
@@ -68,15 +70,18 @@ async function sendReservationConfirmation(guestName: string, guestEmail: string
   }
 }
 
-async function sendAdminNotification(guestName: string, guestEmail: string, checkInDate: string, checkOutDate: string, numberOfGuests: number, totalPrice: number, reservationId: string) {
+async function sendAdminNotification(guestName: string, guestEmail: string, checkInDate: string, checkOutDate: string, numberOfGuests: number, totalPrice: number, reservationId: string, notes?: string, hasPet?: boolean, petBreed?: string) {
   try {
     const checkInFormatted = new Date(checkInDate).toLocaleDateString('cs-CZ');
     const checkOutFormatted = new Date(checkOutDate).toLocaleDateString('cs-CZ');
 
+    const notesSection = notes ? `<p><strong>Poznámka od hosta:</strong><br/>${notes}</p>` : '';
+    const petSection = hasPet ? `<p><strong>Domácí zvíře:</strong> ${petBreed || 'Ano'} (poplatek 550 Kč)</p>` : '';
+
     const htmlContent = `
       <html>
         <body style="font-family: Arial, sans-serif; color: #333;">
-          <h2>Nová rezervace - Chalupa Jasmína</h2>
+          <h2>Nová rezervace - Chalupa Brdy</h2>
           <p>Byla vytvořena nová rezervace:</p>
           <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
             <p><strong>Číslo rezervace:</strong> ${reservationId}</p>
@@ -86,16 +91,18 @@ async function sendAdminNotification(guestName: string, guestEmail: string, chec
             <p><strong>Odjezd:</strong> ${checkOutFormatted}</p>
             <p><strong>Počet hostů:</strong> ${numberOfGuests}</p>
             <p><strong>Cena:</strong> ${totalPrice.toLocaleString('cs-CZ')} Kč</p>
+            ${petSection}
+            ${notesSection}
           </div>
           <p><a href="https://yoursite.com/admin">Jít do administrace</a></p>
         </body>
       </html>
     `;
 
-    if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD && process.env.ADMIN_EMAIL) {
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
       await transporter.sendMail({
         from: process.env.EMAIL_FROM || 'info@chalupa.cz',
-        to: process.env.ADMIN_EMAIL,
+        to: process.env.EMAIL_USER,
         subject: `Nová rezervace - ${guestName}`,
         html: htmlContent,
       });
@@ -129,7 +136,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validace vstupních dat
-    const { guestName, guestEmail, guestPhone, checkInDate, checkOutDate, numberOfGuests } = body;
+    const { guestName, guestEmail, guestPhone, checkInDate, checkOutDate, numberOfGuests, notes, hasPet, petBreed } = body;
 
     if (!guestName || !guestEmail || !checkInDate || !checkOutDate || !numberOfGuests) {
       return NextResponse.json(
@@ -148,12 +155,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Výpočet ceny
-    const cottage = await getCottageInfo();
-    const nights = Math.ceil(
-      (new Date(checkOutDate).getTime() - new Date(checkInDate).getTime()) /
-        (1000 * 60 * 60 * 24)
-    );
-    const totalPrice = cottage.pricePerNight * nights;
+    const pricing = calculateReservationPrice(checkInDate, checkOutDate);
+    if (pricing.error) {
+      return NextResponse.json(
+        { error: pricing.error },
+        { status: 400 }
+      );
+    }
+
+    let totalPrice = pricing.totalPrice;
+    if (hasPet) {
+      totalPrice += 550;
+    }
 
     // Vytvoření rezervace
     const reservation = await addReservation({
@@ -165,6 +178,9 @@ export async function POST(request: NextRequest) {
       numberOfGuests: parseInt(numberOfGuests, 10),
       totalPrice,
       status: 'pending',
+      notes: notes || undefined,
+      hasPet: hasPet || false,
+      petBreed: petBreed || undefined,
     });
 
     // Odeslání potvrzovacího emailu
@@ -175,7 +191,10 @@ export async function POST(request: NextRequest) {
       checkOutDate,
       numberOfGuests,
       totalPrice,
-      reservation.id
+      reservation.id,
+      notes,
+      hasPet,
+      petBreed
     );
 
     // Odeslání notifikace administrátorovi
@@ -186,7 +205,10 @@ export async function POST(request: NextRequest) {
       checkOutDate,
       numberOfGuests,
       totalPrice,
-      reservation.id
+      reservation.id,
+      notes,
+      hasPet,
+      petBreed
     );
 
     return NextResponse.json(

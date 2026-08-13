@@ -35,6 +35,9 @@ async function initializeDatabase() {
         "numberOfGuests" INTEGER NOT NULL,
         "totalPrice" NUMERIC NOT NULL,
         status TEXT DEFAULT 'pending',
+        notes TEXT,
+        "hasPet" BOOLEAN DEFAULT FALSE,
+        "petBreed" TEXT,
         "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
@@ -86,7 +89,7 @@ async function initializeDatabase() {
           'Vytápění (plynový kotel a radiátory)',
           'Kuchyň (sporák, trouba, mikrovlnka, lednice)',
           '2 ložnice',
-          'Prostorny obývák spojený s jídelnou',
+          'Prostorný obývák spojený s jídelnou',
           '8 míst na spaní (3x dvoulůžko, 1x jednolůžko, 1x rozkládací gauč)',
           'Zahrada',
           'Gril',
@@ -212,12 +215,12 @@ async function initializeDatabase() {
           location: 'Třemšín (15 km)',
           difficulty: 'medium',
           duration: '3 hodiny',
-          highlights: ['Středověké ruiny', 'Historická architektura', 'Panoramatický výhled', 'Fotografické Body'],
+          highlights: ['Středověké ruiny', 'Historická architektura', 'Panoramatický výhled', 'Fotografické body'],
           image: '/trips/hrad-tremstin.jpg',
         },
         {
           name: 'Historická architektura Železného Újezda',
-          description: 'Procházka zaměřená na tradičí českou architekturu a místní památky. Uvidíte krásné venkovské stavby, sochu svatého Floriana a seznámíte se s kulturním dědictvím regionu.',
+          description: 'Procházka zaměřená na tradiční českou architekturu a místní památky. Uvidíte krásné venkovské stavby, sochu svatého Floriana a seznámíte se s kulturním dědictvím regionu.',
           location: 'Železný Újezd',
           difficulty: 'easy',
           duration: '1.5 hodin',
@@ -226,7 +229,7 @@ async function initializeDatabase() {
         },
         {
           name: 'Cyklovýlet na Čížkov',
-          description: 'Příjemný cyklistický výlet do nedalekého Čížkova. Cesta vede po místních cyklostezkách, skrz pitoreskní krajinu. V Čížkově si můžete odpočinout a ochutnat místní speciality.',
+          description: 'Příjemný cyklistický výlet do nedalekého Čížkova. Cesta vede po místních cyklostezkách skrze pitoreskní krajinu. V Čížkově si můžete odpočinout a ochutnat místní speciality.',
           location: 'Čížkov (6 km)',
           difficulty: 'medium',
           duration: '2.5 hodin',
@@ -306,8 +309,8 @@ export async function addReservation(
   await pool.query(`
     INSERT INTO reservations (
       id, "guestName", "guestEmail", "guestPhone", "checkInDate", "checkOutDate",
-      "numberOfGuests", "totalPrice", status, "createdAt"
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      "numberOfGuests", "totalPrice", status, notes, "hasPet", "petBreed", "createdAt"
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
   `, [
     id,
     reservation.guestName,
@@ -318,6 +321,9 @@ export async function addReservation(
     reservation.numberOfGuests,
     reservation.totalPrice,
     reservation.status || 'pending',
+    reservation.notes || null,
+    reservation.hasPet || false,
+    reservation.petBreed || null,
     createdAt,
   ]);
 
@@ -372,8 +378,11 @@ export async function updateReservation(
       "checkOutDate" = $5,
       "numberOfGuests" = $6,
       "totalPrice" = $7,
-      status = $8
-    WHERE id = $9
+      status = $8,
+      notes = $9,
+      "hasPet" = $10,
+      "petBreed" = $11
+    WHERE id = $12
   `, [
     updated.guestName,
     updated.guestEmail,
@@ -383,6 +392,9 @@ export async function updateReservation(
     updated.numberOfGuests,
     updated.totalPrice,
     updated.status,
+    updated.notes || null,
+    updated.hasPet || false,
+    updated.petBreed || null,
     id,
   ]);
 
