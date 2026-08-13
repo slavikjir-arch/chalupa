@@ -294,6 +294,20 @@ export default function AdminPage() {
                 <p className="text-sm text-gray-600">Cena:</p>
                 <p className="font-semibold text-lg text-blue-600">{selectedReservation.totalPrice} Kč</p>
               </div>
+              {selectedReservation.hasPet && (
+                <div>
+                  <p className="text-sm text-gray-600">Domácí zvíře:</p>
+                  <p className="font-semibold">
+                    {selectedReservation.petBreed || 'Ano'} (poplatek 550 Kč)
+                  </p>
+                </div>
+              )}
+              {selectedReservation.notes && (
+                <div>
+                  <p className="text-sm text-gray-600">Poznámka:</p>
+                  <p className="font-semibold">{selectedReservation.notes}</p>
+                </div>
+              )}
             </div>
 
             <div className="space-y-2 mb-6">
