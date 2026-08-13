@@ -68,6 +68,24 @@ export default function ReservationsPage() {
     setMessage(null);
 
     try {
+      // Kontrola, že data nejsou v minulosti
+      const checkInDate = new Date(formData.checkInDate);
+      const checkOutDate = new Date(formData.checkOutDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (checkInDate < today) {
+        setMessage({ type: 'error', text: 'Datum příjezdu nemůže být v minulosti' });
+        setLoading(false);
+        return;
+      }
+
+      if (checkOutDate < today) {
+        setMessage({ type: 'error', text: 'Datum odjezdu nemůže být v minulosti' });
+        setLoading(false);
+        return;
+      }
+
       const pricing = calculateReservationPrice(formData.checkInDate, formData.checkOutDate);
 
       if (pricing.error) {

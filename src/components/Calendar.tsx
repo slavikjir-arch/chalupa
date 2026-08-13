@@ -28,6 +28,14 @@ export default function Calendar({
     return day === 0 ? 6 : day - 1;
   };
 
+  const isDateInPast = (day: number): boolean => {
+    const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const selectedDate = new Date(dateStr);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return selectedDate < today;
+  };
+
   const isDateBooked = (day: number): boolean => {
     const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     return bookedDates.has(dateStr);
@@ -49,7 +57,7 @@ export default function Calendar({
   const handleDateClick = (day: number) => {
     const dateStr = getDateString(day);
 
-    if (isDateBooked(day)) return;
+    if (isDateBooked(day) || isDateInPast(day)) return;
 
     if (!checkInDate) {
       // Vybírám check-in
@@ -88,8 +96,18 @@ export default function Calendar({
     days.push(day);
   }
 
+  const isMonthInPast = (): boolean => {
+    const today = new Date();
+    return (
+      currentDate.getFullYear() < today.getFullYear() ||
+      (currentDate.getFullYear() === today.getFullYear() && currentDate.getMonth() < today.getMonth())
+    );
+  };
+
   const previousMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
+    if (!isMonthInPast()) {
+      setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
+    }
   };
 
   const nextMonth = () => {
@@ -102,7 +120,12 @@ export default function Calendar({
       <div className="flex justify-between items-center mb-4">
         <button
           onClick={previousMonth}
-          className="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded"
+          disabled={isMonthInPast()}
+          className={`px-3 py-1 rounded ${
+            isMonthInPast()
+              ? 'text-gray-300 cursor-not-allowed'
+              : 'text-gray-600 hover:bg-gray-100'
+          }`}
         >
           ←
         </button>
@@ -134,6 +157,7 @@ export default function Calendar({
           }
 
           const isBooked = isDateBooked(day);
+          const isPast = isDateInPast(day);
           const isCheckin = getDateString(day) === checkInDate;
           const isCheckout = getDateString(day) === checkOutDate;
           const inRange = isDateInRange(day);
@@ -142,10 +166,10 @@ export default function Calendar({
             <button
               key={day}
               onClick={() => handleDateClick(day)}
-              disabled={isBooked}
+              disabled={isBooked || isPast}
               className={`p-2 text-sm rounded text-center font-medium transition ${
-                isBooked
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed line-through'
+                isBooked || isPast
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   : isCheckin || isCheckout
                   ? 'bg-blue-600 text-white border-2 border-blue-800'
                   : inRange
