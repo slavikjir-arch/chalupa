@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // E-mail funkce
-async function sendReservationConfirmation(guestName: string, guestEmail: string, checkInDate: string, checkOutDate: string, numberOfGuests: number, totalPrice: number, reservationId: string, notes?: string, hasPet?: boolean, petBreed?: string) {
+async function sendReservationConfirmation(guestName: string, guestEmail: string, guestPhone: string, checkInDate: string, checkOutDate: string, numberOfGuests: number, totalPrice: number, reservationId: string, notes?: string, hasPet?: boolean, petBreed?: string) {
   try {
     const checkInFormatted = new Date(checkInDate).toLocaleDateString('cs-CZ');
     const checkOutFormatted = new Date(checkOutDate).toLocaleDateString('cs-CZ');
@@ -37,6 +37,7 @@ async function sendReservationConfirmation(guestName: string, guestEmail: string
           <p>Děkujeme za vaši rezervaci! Zde jsou detaily vaší rezervace:</p>
           <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
             <p><strong>Číslo rezervace:</strong> ${reservationId}</p>
+            <p><strong>Telefon:</strong> ${guestPhone}</p>
             <p><strong>Příjezd:</strong> ${checkInFormatted}</p>
             <p><strong>Odjezd:</strong> ${checkOutFormatted}</p>
             <p><strong>Počet nocí:</strong> ${nights}</p>
@@ -222,6 +223,7 @@ export async function POST(request: NextRequest) {
       await sendReservationConfirmation(
         guestName,
         guestEmail,
+        guestPhone,
         checkInDate,
         checkOutDate,
         numberOfGuests,
