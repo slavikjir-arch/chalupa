@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Chalupa Brdy - pronájem chalupy",
   description: "Pronájem malebné chalupy Brdy v Železném Újezdě s rezervačním systémem a informacemi o výletech",
+  verification: {
+    google: "google3bf89fcfc2905f51",
+  },
 };
 
 export default function RootLayout({
