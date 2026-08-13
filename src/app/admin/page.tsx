@@ -223,8 +223,7 @@ export default function AdminPage() {
                           {reservation.guestEmail}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-600">
-                          {new Date(reservation.checkInDate).toLocaleDateString('cs-CZ')} -
-                          {new Date(reservation.checkOutDate).toLocaleDateString('cs-CZ')}
+                          {new Date(reservation.checkInDate).toLocaleDateString('cs-CZ')} – {new Date(reservation.checkOutDate).toLocaleDateString('cs-CZ')}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-600">
                           {reservation.numberOfGuests}
@@ -282,10 +281,9 @@ export default function AdminPage() {
                 <p className="font-semibold">{selectedReservation.guestPhone}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Příjezd - Odjezd:</p>
+                <p className="text-sm text-gray-600">Příjezd – Odjezd:</p>
                 <p className="font-semibold">
-                  {new Date(selectedReservation.checkInDate).toLocaleDateString('cs-CZ')} -
-                  {new Date(selectedReservation.checkOutDate).toLocaleDateString('cs-CZ')}
+                  {new Date(selectedReservation.checkInDate).toLocaleDateString('cs-CZ')} – {new Date(selectedReservation.checkOutDate).toLocaleDateString('cs-CZ')}
                 </p>
               </div>
               <div>

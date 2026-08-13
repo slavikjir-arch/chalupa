@@ -33,6 +33,7 @@ export default function ReservationsPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [bookedDates, setBookedDates] = useState<Set<string>>(new Set());
+  const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
 
   // Načtení rezervací při mountu
   useEffect(() => {
@@ -69,6 +70,12 @@ export default function ReservationsPage() {
     try {
       const pricing = calculateReservationPrice(formData.checkInDate, formData.checkOutDate);
 
+      if (pricing.error) {
+        setMessage({ type: 'error', text: pricing.error });
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch('/api/reservations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -98,6 +105,7 @@ export default function ReservationsPage() {
           hasPet: false,
           petBreed: '',
         });
+        setTouched({});
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'Chyba při odeslání formuláře' });
@@ -107,22 +115,39 @@ export default function ReservationsPage() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const target = e.target;
-    const { name } = target;
-    let value: string | boolean;
+    const target = e.target as HTMLInputElement;
+    const { name, type } = target;
 
-    if ('checked' in target) {
-      value = target.checked;
+    if (type === 'checkbox') {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: target.checked,
+      }));
     } else {
-      value = target.value;
+      setFormData((prev) => ({
+        ...prev,
+        [name]: target.value,
+      }));
     }
+  };
 
-    setFormData((prev) => ({
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name } = e.target;
+    setTouched((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: true,
     }));
   };
 
+
+  const isValidEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const isValidPhone = (phone: string) => {
+    const cleaned = phone.replace(/\s/g, '');
+    return /^(\+420)?[0-9]{9,10}$/.test(cleaned);
+  };
 
   const getPricing = () => {
     if (!formData.checkInDate || !formData.checkOutDate) {
@@ -272,10 +297,18 @@ export default function ReservationsPage() {
                   name="guestName"
                   value={formData.guestName}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    touched.guestName && !formData.guestName
+                      ? 'border-red-500 focus:ring-red-500'
+                      : 'border-gray-300'
+                  }`}
                   placeholder="Vaše jméno a příjmení"
                 />
+                {touched.guestName && !formData.guestName && (
+                  <p className="text-red-500 text-sm mt-1">Prosím vyplňte vaše jméno</p>
+                )}
               </div>
 
               <div className="mb-4">
@@ -287,10 +320,18 @@ export default function ReservationsPage() {
                   name="guestEmail"
                   value={formData.guestEmail}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    touched.guestEmail && !isValidEmail(formData.guestEmail)
+                      ? 'border-red-500 focus:ring-red-500'
+                      : 'border-gray-300'
+                  }`}
                   placeholder="vase.email@priklad.cz"
                 />
+                {touched.guestEmail && !isValidEmail(formData.guestEmail) && (
+                  <p className="text-red-500 text-sm mt-1">Prosím vyplňte správný email</p>
+                )}
               </div>
 
               <div className="mb-4">
@@ -302,10 +343,18 @@ export default function ReservationsPage() {
                   name="guestPhone"
                   value={formData.guestPhone}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    touched.guestPhone && !isValidPhone(formData.guestPhone)
+                      ? 'border-red-500 focus:ring-red-500'
+                      : 'border-gray-300'
+                  }`}
                   placeholder="+420 123 456 789"
                 />
+                {touched.guestPhone && !isValidPhone(formData.guestPhone) && (
+                  <p className="text-red-500 text-sm mt-1">Prosím vyplňte české telefonní číslo (9-10 číslic)</p>
+                )}
               </div>
             </div>
 
@@ -367,16 +416,18 @@ export default function ReservationsPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading || !formData.checkInDate || !formData.checkOutDate || !!getPricing()?.error}
+              disabled={
+                loading ||
+                !formData.checkInDate ||
+                !formData.checkOutDate ||
+                !formData.guestName ||
+                !isValidEmail(formData.guestEmail) ||
+                !isValidPhone(formData.guestPhone) ||
+                !!getPricing()?.error
+              }
               className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              {loading
-                ? 'Odesílání...'
-                : !formData.checkInDate || !formData.checkOutDate
-                  ? 'Vyberte datum v kalendáři'
-                  : getPricing()?.error
-                    ? 'Opravte chybu výběru data'
-                    : 'Zarezervovat'}
+              {loading ? 'Odesílání...' : 'Zarezervovat'}
             </button>
 
             <p className="text-sm text-gray-600 text-center">

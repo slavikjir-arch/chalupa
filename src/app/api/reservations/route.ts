@@ -145,12 +145,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Ověření dostupnosti
-    const isAvailable = await getAvailability(checkInDate, checkOutDate);
-    if (!isAvailable) {
+    // Validace emailu
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail)) {
       return NextResponse.json(
-        { error: 'Vybrané období není dostupné' },
+        { error: 'Neplatný email' },
         { status: 400 }
+      );
+    }
+
+    // Validace telefonu (české číslo +420 nebo bez předvolby)
+    const cleanedPhone = guestPhone.replace(/\s/g, '');
+    if (!/^(\+420)?[0-9]{9,10}$/.test(cleanedPhone)) {
+      return NextResponse.json(
+        { error: 'Neplatné telefonní číslo. Vyžaduje se české číslo (9-10 číslic)' },
+        { status: 400 }
+      );
+    }
+
+    // Ověření dostupnosti
+    try {
+      const isAvailable = await getAvailability(checkInDate, checkOutDate);
+      if (!isAvailable) {
+        return NextResponse.json(
+          { error: 'Vybrané období není dostupné' },
+          { status: 400 }
+        );
+      }
+    } catch (dbError) {
+      console.error('Chyba databáze při ověření dostupnosti:', dbError);
+      return NextResponse.json(
+        { error: 'Chyba databáze - zkontroluj server logs' },
+        { status: 500 }
       );
     }
 
@@ -169,47 +194,64 @@ export async function POST(request: NextRequest) {
     }
 
     // Vytvoření rezervace
-    const reservation = await addReservation({
-      guestName,
-      guestEmail,
-      guestPhone,
-      checkInDate,
-      checkOutDate,
-      numberOfGuests: parseInt(numberOfGuests, 10),
-      totalPrice,
-      status: 'pending',
-      notes: notes || undefined,
-      hasPet: hasPet || false,
-      petBreed: petBreed || undefined,
-    });
+    let reservation;
+    try {
+      reservation = await addReservation({
+        guestName,
+        guestEmail,
+        guestPhone,
+        checkInDate,
+        checkOutDate,
+        numberOfGuests: parseInt(numberOfGuests, 10),
+        totalPrice,
+        status: 'pending',
+        notes: notes || undefined,
+        hasPet: hasPet || false,
+        petBreed: petBreed || undefined,
+      });
+    } catch (dbError) {
+      console.error('Chyba databáze při vytváření rezervace:', dbError);
+      return NextResponse.json(
+        { error: 'Chyba databáze - zkontroluj server logs' },
+        { status: 500 }
+      );
+    }
 
     // Odeslání potvrzovacího emailu
-    await sendReservationConfirmation(
-      guestName,
-      guestEmail,
-      checkInDate,
-      checkOutDate,
-      numberOfGuests,
-      totalPrice,
-      reservation.id,
-      notes,
-      hasPet,
-      petBreed
-    );
+    try {
+      await sendReservationConfirmation(
+        guestName,
+        guestEmail,
+        checkInDate,
+        checkOutDate,
+        numberOfGuests,
+        totalPrice,
+        reservation.id,
+        notes,
+        hasPet,
+        petBreed
+      );
+    } catch (error) {
+      console.error('Chyba při odesílání potvrzovacího emailu:', error);
+    }
 
     // Odeslání notifikace administrátorovi
-    await sendAdminNotification(
-      guestName,
-      guestEmail,
-      checkInDate,
-      checkOutDate,
-      numberOfGuests,
-      totalPrice,
-      reservation.id,
-      notes,
-      hasPet,
-      petBreed
-    );
+    try {
+      await sendAdminNotification(
+        guestName,
+        guestEmail,
+        checkInDate,
+        checkOutDate,
+        numberOfGuests,
+        totalPrice,
+        reservation.id,
+        notes,
+        hasPet,
+        petBreed
+      );
+    } catch (error) {
+      console.error('Chyba při odesílání notifikace administrátorovi:', error);
+    }
 
     return NextResponse.json(
       { success: true, reservationId: reservation.id },
