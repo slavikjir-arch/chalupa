@@ -48,8 +48,10 @@ export default function ReservationsPage() {
           if (res.status !== 'cancelled') {
             const start = new Date(res.checkInDate);
             const end = new Date(res.checkOutDate);
-            for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
+            const d = new Date(start);
+            while (d < end) {
               booked.add(d.toISOString().split('T')[0]);
+              d.setDate(d.getDate() + 1);
             }
           }
         });
